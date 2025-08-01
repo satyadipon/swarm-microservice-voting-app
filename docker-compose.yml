@@ -5,9 +5,6 @@ services:
     image: dockersamples/examplevotingapp_vote
     ports:
       - "5004:80"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
     networks:
       - voteapp_net
 
@@ -15,17 +12,11 @@ services:
     image: dockersamples/examplevotingapp_result
     ports:
       - "5003:80"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
     networks:
       - voteapp_net
 
   worker:
     image: dockersamples/examplevotingapp_worker
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
     networks:
       - voteapp_net
 
