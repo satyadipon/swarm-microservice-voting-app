@@ -7,6 +7,8 @@ services:
       - "5004:80"
     networks:
       - voteapp_net
+    depends_on:
+      - redis
 
   result:
     image: dockersamples/examplevotingapp_result
@@ -14,24 +16,41 @@ services:
       - "5003:80"
     networks:
       - voteapp_net
+    depends_on:
+      - db
 
   worker:
     image: dockersamples/examplevotingapp_worker
     networks:
       - voteapp_net
+    depends_on:
+      - redis
+      - db
 
   redis:
     image: redis:alpine
     networks:
       - voteapp_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   db:
-    image: postgres:9.4
+    image: postgres:14-alpine
     environment:
       POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "password"
+      POSTGRES_PASSWORD: "postgres"
+    volumes:
+      - db-data:/var/lib/postgresql/data
     networks:
       - voteapp_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   visualizer:
     image: dockersamples/visualizer
@@ -48,3 +67,6 @@ services:
 networks:
   voteapp_net:
     driver: overlay
+
+volumes:
+  db-data:
